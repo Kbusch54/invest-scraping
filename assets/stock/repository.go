@@ -77,8 +77,7 @@ func (r *MongoRepository) FindByName(name string) (*Stock, error) {
 	filter := bson.M{"name": name}
 	err := r.conn.Datastore.Collection(r.absrepo.Collection).FindOne(context.Background(), filter).Decode(&stk)
 	if err != nil {
-		r.log.Error("FindByName Error finding Stock. Reason: ", err.Error())
-		return nil, err
+		return &Stock{}, err
 	}
 	return &stk, nil
 }
