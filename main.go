@@ -1,8 +1,12 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"net/http"
 
+	"github.com/gin-gonic/gin"
+	"github.com/invest-scraping/api"
 	"github.com/invest-scraping/assets"
 	"github.com/invest-scraping/config"
 	"github.com/invest-scraping/logg"
@@ -30,6 +34,8 @@ func main() {
 	}
 	go registerSchedulers(cfg, &conn)
 
+	registerRoutes(cfg, &conn)
+
 }
 
 func registerAssets(conn *mongodb.MongoConnection, cfg *config.Config) error {
@@ -55,4 +61,38 @@ func Schedulers(cfg *config.Config, conn *mongodb.MongoConnection) []scheduler.S
 	return []scheduler.Scheduler{
 		updatePrice,
 	}
+}
+func registerRoutes(cfg *config.Config, conn *mongodb.MongoConnection) {
+	r := gin.Default()
+	r.Use(Cors())
+	// r.LoadHTMLGlob("./web/templates/*")
+	routes := api.NewRoutes(r.RouterGroup, conn, cfg)
+
+	routes.StockPriceRoutes()
+
+	r.Run(":" + getDefaultPort(cfg))
+}
+
+func Cors() gin.HandlerFunc {
+	return func(c *gin.Context) {
+		origin := c.GetHeader("Origin")
+		c.Writer.Header().Set("Access-Control-Allow-Origin", origin)
+		c.Writer.Header().Set("Content-Type", "application/json")
+		c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Origin, Content-Type, X-Auth-Token, Content-Length, Accept-Encoding,X-CSRF-Token, Authorization, Nonce, Nonce-Signature, Address, Access-Control-Allow-Origin, Set-Cookie")
+		c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS, GET, PUT, DELETE, HEAD, PATCH")
+		c.Writer.Header().Set("Access-Control-Allow-Credentials", "true")
+
+		if c.Request.Method == "OPTIONS" {
+			c.Writer.WriteHeader(http.StatusOK)
+			return
+		}
+
+		c.Next()
+	}
+}
+
+func getDefaultPort(cfg *config.Config) string {
+	port := flag.String("port", cfg.Server.Port, "Instance port")
+	flag.Parse()
+	return *port
 }
