@@ -2,6 +2,7 @@ package scraping
 
 import (
 	"errors"
+	"time"
 
 	"github.com/invest-scraping/config"
 	"github.com/invest-scraping/logg"
@@ -14,6 +15,7 @@ var (
 
 type Service interface {
 	RunPriceUpdate(key string) (string, error)
+	GetLastUpdatedBySymbol(symbol string) (time.Time, error)
 }
 
 type ServiceDefaultImpl struct {
@@ -40,4 +42,12 @@ func (s *ServiceDefaultImpl) RunPriceUpdate(key string) (string, error) {
 		return "", ErrScraperNotFound
 	}
 	return scraper.RunQuery()
+}
+
+func (s *ServiceDefaultImpl) GetLastUpdatedBySymbol(symbol string) (time.Time, error) {
+	scraper, ok := s.scrapers[symbol]
+	if !ok {
+		return time.Time{}, ErrScraperNotFound
+	}
+	return scraper.LastUpdated(), nil
 }
