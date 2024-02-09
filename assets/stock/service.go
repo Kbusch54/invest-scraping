@@ -35,7 +35,7 @@ func (s *ServiceDefaultImpl) CreateOrUpdateStock(name, symbol, stockType, endpoi
 	stock, err := s.repo.FindByName(name)
 	if err != nil {
 		if err == mongo.ErrNoDocuments {
-			stock.NewStock(name, symbol, stockType, endpoint, last_price)
+			stock = stock.NewStock(name, symbol, stockType, endpoint, last_price)
 			return s.repo.UpdateOrInsert(stock)
 		}
 		s.log.Error("Error finding stock. Reason: ", err.Error())

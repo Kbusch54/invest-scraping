@@ -29,7 +29,7 @@ func NewStockPriceService(conn *mongodb.MongoConnection) Service {
 
 func (s *ServiceDefaultImpl) CreateStockPrice(name, symbol string, last_price float64, time time.Time) error {
 	stockPrice := &StockPrice{}
-	stockPrice.NewStockPrice(name, symbol, last_price, time)
+	stockPrice = stockPrice.NewStockPrice(name, symbol, last_price, time)
 	return s.repo.CreateStockPrice(stockPrice)
 
 }
