@@ -37,6 +37,7 @@ func (s *Stock) UpdateLastPrice(price float64, time time.Time) {
 
 func (s *Stock) NewStock(name, symbol, stockType, endpoint string, last_price float64) *Stock {
 	return &Stock{
+		ID:        primitive.NewObjectID(),
 		Name:      name,
 		StockType: stockType,
 		Endpoint:  endpoint,
