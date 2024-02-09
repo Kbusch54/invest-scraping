@@ -1,0 +1,17 @@
+app: invest-scraping
+
+stream:
+  kafka:
+    brokers: localhost:9092
+persistence:
+  mongodb:
+    url: mongodb://localhost:27017/
+    database: invest-stocks
+
+
+services: 
+    investing:
+      host: https://www.investing.com/
+server:
+  port: 7000
+  host: localhost
