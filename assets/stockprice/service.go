@@ -8,7 +8,7 @@ import (
 )
 
 type Service interface {
-	CreateStockPrice(name, symbol string, last_price float64) error
+	CreateStockPrice(name, symbol string, last_price float64, time time.Time) error
 	GetPricesSince(name string, since time.Time) ([]StockPriceResponse, error)
 	FindByName(name string) (StockPriceResponse, error)
 }
@@ -27,9 +27,9 @@ func NewStockPriceService(conn *mongodb.MongoConnection) Service {
 	}
 }
 
-func (s *ServiceDefaultImpl) CreateStockPrice(name, symbol string, last_price float64) error {
+func (s *ServiceDefaultImpl) CreateStockPrice(name, symbol string, last_price float64, time time.Time) error {
 	stockPrice := &StockPrice{}
-	stockPrice.NewStockPrice(name, symbol, last_price)
+	stockPrice.NewStockPrice(name, symbol, last_price, time)
 	return s.repo.CreateStockPrice(stockPrice)
 
 }
