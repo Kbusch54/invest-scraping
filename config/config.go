@@ -38,8 +38,7 @@ func Load(cfgpath string) *Config {
 	if err := viper.Unmarshal(&cfg); err != nil {
 		panic("Error unmarshalling configuration: " + err.Error())
 	}
-
-	fmt.Println("Configuration loaded successfully", cfg.Persistence.MongoDB.URL)
+	RegisterMonitors(cfg)
 	return cfg
 }
 

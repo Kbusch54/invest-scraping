@@ -8,9 +8,9 @@ import (
 )
 
 const (
-	defaultMonitorsDir    = "./config/env/monitors_production/"
-	stagingMonitorsDir    = "./config/env/monitors_production/"
-	productionMonitorsDir = "./config/env/monitors_production/"
+	defaultMonitorsDir    = "./config/env/monitors/"
+	stagingMonitorsDir    = "./config/env/monitors/"
+	productionMonitorsDir = "./config/env/monitors/"
 )
 
 var log = logger.NewDefaultLog()
