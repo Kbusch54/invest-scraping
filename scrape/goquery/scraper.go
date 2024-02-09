@@ -10,7 +10,6 @@ import (
 )
 
 type Scraper struct {
-	// some fields
 	document    *html.Node
 	url         string
 	path        string
