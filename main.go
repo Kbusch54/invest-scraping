@@ -25,10 +25,10 @@ func main() {
 
 	err := registerAssets(&conn, cfg)
 	if err != nil {
+		logger.Error("Error registering assets. Reason: ", err.Error())
 		panic(err)
 	}
-
-	registerSchedulers(cfg, &conn)
+	go registerSchedulers(cfg, &conn)
 
 }
 
