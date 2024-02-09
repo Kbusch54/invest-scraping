@@ -19,13 +19,9 @@ type MongoRepository struct {
 	log     logg.Logger
 }
 type Repository interface {
-	// FindAll() (*[]Stock, error)
 	FindLatestStockPrice(symbol string) (*StockPrice, error)
 	FindStockPriceBySymbol(symbol string, since time.Time) (*[]StockPrice, error)
 	CreateStockPrice(stockPrice *StockPrice) error
-	// FindByID(id string) (*Stock, error)
-	// UpdateOrInsert(stfxFollow *Stock) error
-	// FindByName(name string) (*Stock, error)
 }
 
 func NewMongoRepository(conn *mongodb.MongoConnection) Repository {

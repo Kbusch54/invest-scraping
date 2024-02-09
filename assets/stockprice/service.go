@@ -18,7 +18,7 @@ type ServiceDefaultImpl struct {
 	log  logg.Logger
 }
 
-func NewStockService(conn *mongodb.MongoConnection) Service {
+func NewStockPriceService(conn *mongodb.MongoConnection) Service {
 	log := logg.NewDefaultLog()
 	repos := NewMongoRepository(conn)
 	return &ServiceDefaultImpl{

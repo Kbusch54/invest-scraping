@@ -1,8 +1,6 @@
 package stock
 
 import (
-	"time"
-
 	"github.com/invest-scraping/logg"
 	"github.com/invest-scraping/persistence/mongodb"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -12,6 +10,8 @@ type Service interface {
 	CreateOrUpdateStock(name, symbol, stockType, endpoint string, last_price float64) error
 	FindAll() ([]StockResponse, error)
 	FindByName(name string) (StockResponse, error)
+	GetStockByName(name string) (*Stock, error)
+	UpdateStock(*Stock) error
 }
 
 type ServiceDefaultImpl struct {
@@ -39,8 +39,7 @@ func (s *ServiceDefaultImpl) CreateOrUpdateStock(name, symbol, stockType, endpoi
 		s.log.Error("Error finding stock. Reason: ", err.Error())
 		return err
 	}
-	stock.LastPrice = last_price
-	stock.UpdatedAt = time.Now()
+	stock.UpdateLastPrice(last_price)
 	return s.repo.UpdateOrInsert(stock)
 
 }
@@ -62,4 +61,12 @@ func (s *ServiceDefaultImpl) FindByName(name string) (StockResponse, error) {
 		return StockResponse{}, err
 	}
 	return *stock.toResponse(), nil
+}
+
+func (s *ServiceDefaultImpl) UpdateStock(stock *Stock) error {
+	return s.repo.UpdateOrInsert(stock)
+}
+
+func (s *ServiceDefaultImpl) GetStockByName(name string) (*Stock, error) {
+	return s.repo.FindByName(name)
 }
