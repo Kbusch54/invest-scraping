@@ -3,6 +3,7 @@ package assets
 import (
 	"encoding/json"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/invest-scraping/assets/scraping"
@@ -49,7 +50,7 @@ func NewAssetsService(conn *mongodb.MongoConnection, cfg *config.Config) Service
 func (s *ServiceDefaultImpl) NewPriceInput(name, symbol string, price float64, time time.Time) error {
 	stock, err := s.sSvc.GetStockByName(name)
 	if err != nil {
-		s.log.Error("Error finding stock. Reason: ", err.Error())
+		s.log.Error("Assets.Service Error finding stock. Reason: ", err.Error())
 		return err
 	}
 	stock.UpdateLastPrice(price, time)
@@ -85,7 +86,7 @@ func (s *ServiceDefaultImpl) RunPricePerAssetUpdate(m *config.Monitor) error {
 		s.log.Error("Error running price update. Reason: ", err.Error())
 		return err
 	}
-	parsedPrice, err := strconv.ParseFloat(priceStr, 64)
+	parsedPrice, err := strconv.ParseFloat(strings.ReplaceAll(priceStr, ",", ""), 64)
 	if err != nil {
 		s.log.Error("Error parsing price. Reason: ", err.Error())
 		return err
