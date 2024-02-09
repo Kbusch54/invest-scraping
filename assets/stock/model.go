@@ -30,9 +30,9 @@ func (s *Stock) toResponse() *StockResponse {
 	}
 }
 
-func (s *Stock) UpdateLastPrice(price float64) {
+func (s *Stock) UpdateLastPrice(price float64, time time.Time) {
 	s.LastPrice = price
-	s.UpdatedAt = time.Now()
+	s.UpdatedAt = time
 }
 
 func (s *Stock) NewStock(name, symbol, stockType, endpoint string, last_price float64) *Stock {

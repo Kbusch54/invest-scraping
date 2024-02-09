@@ -1,13 +1,15 @@
 package stock
 
 import (
+	"time"
+
 	"github.com/invest-scraping/logg"
 	"github.com/invest-scraping/persistence/mongodb"
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
 type Service interface {
-	CreateOrUpdateStock(name, symbol, stockType, endpoint string, last_price float64) error
+	CreateOrUpdateStock(name, symbol, stockType, endpoint string, last_price float64, time time.Time) error
 	FindAll() ([]StockResponse, error)
 	FindByName(name string) (StockResponse, error)
 	GetStockByName(name string) (*Stock, error)
@@ -28,7 +30,7 @@ func NewStockService(conn *mongodb.MongoConnection) Service {
 	}
 }
 
-func (s *ServiceDefaultImpl) CreateOrUpdateStock(name, symbol, stockType, endpoint string, last_price float64) error {
+func (s *ServiceDefaultImpl) CreateOrUpdateStock(name, symbol, stockType, endpoint string, last_price float64, time time.Time) error {
 	stock := &Stock{}
 	stock, err := s.repo.FindByName(name)
 	if err != nil {
@@ -39,7 +41,7 @@ func (s *ServiceDefaultImpl) CreateOrUpdateStock(name, symbol, stockType, endpoi
 		s.log.Error("Error finding stock. Reason: ", err.Error())
 		return err
 	}
-	stock.UpdateLastPrice(last_price)
+	stock.UpdateLastPrice(last_price, time)
 	return s.repo.UpdateOrInsert(stock)
 
 }

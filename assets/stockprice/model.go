@@ -27,13 +27,13 @@ func (s *StockPrice) toResponse() *StockPriceResponse {
 	}
 }
 
-func (s *StockPrice) NewStockPrice(name, symbol string, price float64) *StockPrice {
+func (s *StockPrice) NewStockPrice(name, symbol string, price float64, time time.Time) *StockPrice {
 	return &StockPrice{
 		ID:     primitive.NewObjectID(),
 		Name:   name,
 		Symbol: symbol,
 		Price:  price,
-		Time:   time.Now(),
+		Time:   time,
 	}
 }
 
