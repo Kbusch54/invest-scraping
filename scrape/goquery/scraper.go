@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"time"
 
 	"github.com/antchfx/htmlquery"
 	"golang.org/x/net/html"
@@ -14,6 +15,7 @@ type Scraper struct {
 	url         string
 	path        string
 	returnValue string
+	lastUpdated time.Time
 }
 
 var (
@@ -38,6 +40,7 @@ func (s *Scraper) GetDocument() error {
 		return fmt.Errorf("status code error: %d %s", res.StatusCode, res.Status)
 	}
 
+	s.lastUpdated = time.Now()
 	// Parse the page
 	doc, err := htmlquery.Parse(res.Body)
 	if err != nil {
@@ -68,4 +71,8 @@ func (s *Scraper) RunQuery() (string, error) {
 		return "", err
 	}
 	return s.returnValue, nil
+}
+
+func (s *Scraper) LastUpdated() time.Time {
+	return s.lastUpdated
 }
