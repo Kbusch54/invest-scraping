@@ -1,6 +1,9 @@
 package updater
 
 import (
+	"sync"
+	"time"
+
 	"github.com/invest-scraping/assets"
 	"github.com/invest-scraping/config"
 	"github.com/invest-scraping/logg"
@@ -27,12 +30,34 @@ func NewPriceUpdaterScheduler(conn *mongodb.MongoConnection, cfg *config.Config)
 	}
 }
 func (s *PriceUpdaterSchedulerImpl) Execute() {
+	startTime := time.Now()
+	s.log.Info("Running scheduled update prices")
+	var wg sync.WaitGroup
 	for _, m := range s.monitors {
-		err := s.aSvc.RunPricePerAssetUpdate(m)
-		if err != nil {
-			s.log.Error("Error updating price for asset. Reason: ", err.Error())
-		}
+		wg.Add(1)
+		go func(mon config.Monitor) {
+			defer wg.Done()
+			err := s.aSvc.RunPricePerAssetUpdate(&mon)
+			if err != nil {
+				s.log.Error("Error updating price for asset. Reason: ", err.Error())
+			}
+		}(*m)
 	}
+	wg.Wait()
+	qualifier := "seconds"
+	duration := time.Since(startTime).Seconds()
+	if time.Since(startTime).Seconds() < 60 {
+		duration = time.Since(startTime).Seconds()
+	} else if time.Since(startTime).Seconds() > 60 {
+		duration = time.Since(startTime).Minutes()
+		qualifier = "minutes"
+	} else if time.Since(startTime).Minutes() > 60 {
+		duration = time.Since(startTime).Hours()
+		qualifier = "hours"
+	}
+	processed := len(s.monitors)
+	s.log.Infof("Finished running scheduled update asset prices. Processed: %v assets. Duration: %v %s", processed, duration, qualifier)
+
 }
 
 func (s *PriceUpdaterSchedulerImpl) Expression() string {
