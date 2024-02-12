@@ -20,7 +20,7 @@ type MongoRepository struct {
 }
 type Repository interface {
 	FindLatestStockPrice(symbol string) (*StockPrice, error)
-	FindStockPriceBySymbol(symbol string, since time.Time) (*[]StockPrice, error)
+	FindStockPriceByName(name string, since time.Time) (*[]StockPrice, error)
 	CreateStockPrice(stockPrice *StockPrice) error
 }
 
@@ -50,17 +50,25 @@ func (r *MongoRepository) FindLatestStockPrice(symbol string) (*StockPrice, erro
 	return stockPrice, nil
 }
 
-func (r *MongoRepository) FindStockPriceBySymbol(symbol string, since time.Time) (*[]StockPrice, error) {
+func (r *MongoRepository) FindStockPriceByName(name string, since time.Time) (*[]StockPrice, error) {
 	var stockPrices []StockPrice
-	filter := bson.M{"symbol": symbol, "time": bson.M{"$gte": since}}
-
-	res, err := r.conn.Datastore.Collection(r.absrepo.Collection).Find(context.Background(), filter)
+	// filter := bson.M{"name": name, "time": bson.M{"$gte": since}}
+	filter := bson.M{
+		"name": name,
+		"time": bson.M{
+			"$gte": since,
+		},
+	}
+	sort := bson.M{"time": -1}
+	opt := options.Find().SetSort(sort)
+	r.log.Info("Filter: ", filter)
+	res, err := r.conn.Datastore.Collection(r.absrepo.Collection).Find(context.Background(), filter, opt)
 	if err != nil {
-		r.log.Error("FindStockPriceBySymbol Error finding stock prices. Reason: ", err.Error())
+		r.log.Error("FindStockPriceByName Error finding stock prices. Reason: ", err.Error())
 		return nil, err
 	}
 	if err = res.All(context.Background(), &stockPrices); err != nil {
-		r.log.Error("FindStockPriceBySymbol Error finding stock prices. Reason: ", err.Error())
+		r.log.Error("FindStockPriceByName Error finding stock prices. Reason: ", err.Error())
 		return nil, err
 	}
 	return &stockPrices, nil

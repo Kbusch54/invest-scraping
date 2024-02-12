@@ -35,7 +35,7 @@ func (s *ServiceDefaultImpl) CreateStockPrice(name, symbol string, last_price fl
 }
 
 func (s *ServiceDefaultImpl) GetPricesSince(name string, since time.Time) ([]StockPriceResponse, error) {
-	stockPrices, err := s.repo.FindStockPriceBySymbol(name, since)
+	stockPrices, err := s.repo.FindStockPriceByName(name, since)
 	if err != nil {
 		s.log.Error("Error finding stock prices. Reason: ", err.Error())
 		return nil, err

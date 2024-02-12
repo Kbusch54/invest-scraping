@@ -22,6 +22,7 @@ type Service interface {
 	RunPricePerAssetUpdate(m *config.Monitor) error
 	StreamPriceUpdate(name, symbol string, price float64, time time.Time) error
 	ReplayPriceUpdateSince(name string, time time.Time) error
+	GetPricesSince(name string, since time.Time) (StocksResponse, error)
 }
 
 type ServiceDefaultImpl struct {
@@ -135,4 +136,34 @@ func (s *ServiceDefaultImpl) ReplayPriceUpdateSince(name string, since time.Time
 		err = s.StreamPriceUpdate(sp.Name, sp.Symbol, sp.Price, newTime)
 	}
 	return nil
+}
+
+func (s *ServiceDefaultImpl) GetPricesSince(name string, since time.Time) (StocksResponse, error) {
+	stocksResp := StocksResponse{}
+	stockData, err := s.sSvc.GetStockByName(name)
+	if err != nil {
+		s.log.Error("Error finding stock. Reason: ", err.Error())
+		return stocksResp, err
+	}
+	stData, err := s.spSvc.GetPricesSince(name, since)
+	if err != nil {
+		s.log.Error("Error finding stock prices. Reason: ", err.Error())
+		return stocksResp, err
+	}
+	stocksResp.Name = stockData.Name
+	stocksResp.StockType = stockData.StockType
+	stocksResp.Symbol = stockData.Symbol
+	stResp := []StockPriceResponse{}
+	for _, sp := range stData {
+		stResp = append(stResp,
+			StockPriceResponse{
+				Name:   sp.Name,
+				Symbol: sp.Symbol,
+				Price:  sp.Price,
+				Time:   sp.Time,
+			})
+	}
+	stocksResp.StockData = stResp
+	return stocksResp, nil
+
 }

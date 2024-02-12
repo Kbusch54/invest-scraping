@@ -69,7 +69,7 @@ func registerRoutes(cfg *config.Config, conn *mongodb.MongoConnection) {
 	routes := api.NewRoutes(r.RouterGroup, conn, cfg)
 
 	routes.StockPriceRoutes()
-
+	routes.AssetRoutes()
 	r.Run(":" + getDefaultPort(cfg))
 }
 

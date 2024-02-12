@@ -2,6 +2,7 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	"github.com/invest-scraping/assets"
 	"github.com/invest-scraping/assets/stock"
 	"github.com/invest-scraping/config"
 	"github.com/invest-scraping/logg"
@@ -44,4 +45,14 @@ func (r *Routes) StockPriceRoutes() error {
 	}
 	return nil
 
+}
+
+func (r *Routes) AssetRoutes() error {
+	asset := assets.NewController(r.conn, r.cfg)
+	// {
+	r.publicRouterGroup.GET("/asset", asset.GetPricesByAssetName)
+	// 	r.publicRouterGroup.GET("/assets", asset.FindAllAssets)
+	// 	r.publicRouterGroup.GET("/asset/:name", asset.FindAssetByName)
+	// }
+	return nil
 }
